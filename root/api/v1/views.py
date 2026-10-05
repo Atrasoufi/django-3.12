@@ -2,6 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import InfoSerialize
 from rest_framework import status
+from services.models import Services, Category
+from services.api.vi.serializers import ServiceSerializer, CategorySerializer
 
 
 @api_view()
@@ -16,4 +18,18 @@ def test2(request):
         "family": "soufi",
     }
     serializer = InfoSerialize(info)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def services(request):
+    services = Services.objects.filter(status=True).order_by("-created_at")[:3]
+    serializer = ServiceSerializer(services, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def categories(request):
+    categories = Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
